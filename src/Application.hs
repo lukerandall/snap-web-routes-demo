@@ -7,15 +7,15 @@
 module Application where
 
 ------------------------------------------------------------------------------
+import Control.Lens
 import Control.Monad.State
 import Data.Data
-import Data.Lens.Template
 import Data.Time.Clock
 import Data.Text (Text, pack)
+import Heist (HeistT)
 import Snap.Core
 import Snap.Snaplet
 import Snap.Snaplet.Heist
-import Text.Templating.Heist
 import Text.XmlHtml hiding (render)
 import Web.Routes
 import Web.Routes.TH
@@ -34,7 +34,7 @@ data App = App
     , _routeFn   :: AppURL -> [(Text, Maybe Text)] -> Text
     }
 
-makeLens ''App
+makeLenses ''App
 
 instance HasHeist App where
     heistLens = subSnaplet heist
@@ -51,8 +51,8 @@ instance MonadRoute (Handler App App) where
     type URL (Handler App App) = AppURL
     askRouteFn = gets _routeFn
 
-instance (MonadRoute m) => MonadRoute (HeistT m) where
-    type URL (HeistT m) = URL m
+instance (MonadRoute m) => MonadRoute (HeistT n m) where
+    type URL (HeistT n m) = URL m
     askRouteFn = lift askRouteFn
 
 heistURL :: MonadRoute m => URL m -> m [Node]

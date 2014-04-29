@@ -18,11 +18,12 @@ import           Data.Maybe
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import           Data.Time.Clock
+import           Heist
+import           Heist.Interpreted
 import           Snap.Core
 import           Snap.Snaplet
 import           Snap.Snaplet.Heist
 import           Snap.Util.FileServe
-import           Text.Templating.Heist
 import           Text.XmlHtml hiding (render)
 import           Web.Routes
 ------------------------------------------------------------------------------
@@ -39,11 +40,11 @@ index :: Handler App App ()
 index =
     do ifTop $ heistLocal (bindSplices indexSplices) $ render "index"
   where
-    indexSplices =
-        [ ("start-time"  , startTimeSplice)
-        , ("current-time", currentTimeSplice)
-        , ("countURL"     , heistURL (Count 10))
-        ]
+    indexSplices = do
+        "start-time"   ## startTimeSplice
+        "current-time" ## currentTimeSplice
+        "countURL"     ## heistURL (Count 10)
+
 
 ------------------------------------------------------------------------------
 -- | For your convenience, a splice which shows the start time.
